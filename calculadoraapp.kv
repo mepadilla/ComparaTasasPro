@@ -1,0 +1,380 @@
+#:import MDBoxLayout kivymd.uix.boxlayout.MDBoxLayout
+#:import MDLabel kivymd.uix.label.MDLabel
+#:import MDRaisedButton kivymd.uix.button.MDRaisedButton
+#:import MDTextField kivymd.uix.textfield.MDTextField
+#:import MDCard kivymd.uix.card.MDCard
+#:import TwoLineIconListItem kivymd.uix.list.TwoLineIconListItem
+#:import IconLeftWidget kivymd.uix.list.IconLeftWidget
+
+ScreenManager:
+    MenuScreen:
+        name: 'menu'
+    TasasScreen:
+        name: 'tasas'
+    CalculadoraScreen:
+        name: 'calculadora'
+    CalculadoraImplicitaScreen:
+        name: 'calculadora_implicita'
+
+<MenuScreen>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: "20dp"
+        padding: "50dp"
+        adaptive_height: True
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+        Image:
+            source: 'assets/icon01.png'
+            size_hint: None, None
+            size: "128dp", "128dp"
+            pos_hint: {'center_x': 0.5}
+
+        MDLabel:
+            # --- NUEVO NOMBRE AQUÍ ---
+            text: 'ComparaTasasPro'
+            font_style: 'H4'
+            halign: 'center'
+            adaptive_height: True
+
+        MDLabel:
+            text: 'Seleccione una opción:'
+            font_style: 'Body1'
+            halign: 'center'
+            adaptive_height: True
+        
+        MDRaisedButton:
+            text: 'Ver Tasas del Día'
+            on_press: root.manager.current = 'tasas'
+            pos_hint: {'center_x': 0.5}
+        
+        MDRaisedButton:
+            text: 'Calculadora (Automática)'
+            on_press: root.manager.current = 'calculadora'
+            pos_hint: {'center_x': 0.5}
+        
+        MDRaisedButton:
+            text: 'Calculadora (Tasa Manual)'
+            on_press: root.manager.current = 'calculadora_implicita'
+            pos_hint: {'center_x': 0.5}
+        
+        MDFillRoundFlatButton:
+            text: "Acerca de..."
+            on_press: app.show_about_dialog()
+            pos_hint: {'center_x': 0.5}
+            padding: "10dp"
+
+# --- El resto del archivo no necesita cambios ---
+<TasasScreen>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: "20dp"
+        spacing: "10dp"
+        MDLabel:
+            text: 'Tasas de Cambio'
+            font_style: 'H5'
+            halign: 'center'
+            size_hint_y: None
+            height: self.texture_size[1]
+        MDLabel:
+            id: status_label
+            text: "Cargando..."
+            halign: 'center'
+            size_hint_y: None
+            height: self.texture_size[1]
+            theme_text_color: "Secondary"
+        ScrollView:
+            MDList:
+                id: tasas_list
+        MDRaisedButton:
+            text: 'Regresar al Menú'
+            on_press: root.manager.current = 'menu'
+            pos_hint: {'center_x': 0.5}
+            size_hint_y: None
+            height: "48dp"
+
+<CalculadoraScreen>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: "10dp"
+        ScrollView:
+            MDGridLayout:
+                cols: 1
+                spacing: "15dp"
+                adaptive_height: True
+                MDCard:
+                    orientation: 'vertical'
+                    padding: "10dp"
+                    size_hint_y: None
+                    height: "90dp"
+                    MDLabel:
+                        text: 'Tasas en Uso (Automáticas)'
+                        font_style: 'H6'
+                        halign: 'center'
+                    MDLabel:
+                        id: tasas_card_label
+                        text: "Cargando tasas..."
+                        halign: 'center'
+                        theme_text_color: "Secondary"
+                MDCard:
+                    orientation: 'vertical'
+                    padding: "15dp"
+                    spacing: "10dp"
+                    adaptive_height: True
+                    MDLabel:
+                        text: 'Parámetros del Producto'
+                        font_style: 'H6'
+                        halign: 'center'
+                    MDTextField:
+                        id: costo_fob_input
+                        hint_text: "Costo FOB ($)"
+                        text: "100.00"
+                    MDTextField:
+                        id: costo_almacen_input
+                        hint_text: "% Costo Almacén"
+                        text: "30"
+                    MDTextField:
+                        id: gastos_input
+                        hint_text: "% Gastos Totales"
+                        text: "15"
+                    MDTextField:
+                        id: utilidad_input
+                        hint_text: "% Utilidad Neta"
+                        text: "20"
+                    MDTextField:
+                        id: ventas_bs_input
+                        hint_text: "% Ventas en Bs."
+                        text: "100"
+                    MDTextField:
+                        id: solicitado_input
+                        hint_text: "Solicitado por"
+                    MDTextField:
+                        id: producto_input
+                        hint_text: "Producto"
+                MDRaisedButton:
+                    text: "Calcular Precio Final"
+                    on_press: root.realizar_calculo()
+                    pos_hint: {'center_x': 0.5}
+                    size_hint_y: None
+                    height: "48dp"
+                MDCard:
+                    id: results_card
+                    orientation: 'vertical'
+                    padding: "15dp"
+                    spacing: "10dp"
+                    adaptive_height: True
+                    MDGridLayout:
+                        cols: 1
+                        adaptive_height: True
+                        spacing: "8dp"
+                        MDLabel:
+                            text: 'Resultados del Cálculo'
+                            font_style: 'H6'
+                            halign: 'center'
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: cta_label
+                            text: "Costo Total en Almacén (CTA): $0.00"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: pvm_label
+                            text: "Precio Venta Mínimo (PVM): $0.00"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: descuento_label
+                            text: "Descuento Máx. por pago en USD: 0.00%"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: solicitado_result_label
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: producto_result_label
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: fecha_result_label
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: bcv_result_label
+                            font_style: "H6"
+                            theme_text_color: "Primary"
+                            halign: "center"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: pvp_label
+                            text: "PVP USD: $0.00"
+                            font_style: "H5"
+                            theme_text_color: "Primary"
+                            bold: True
+                            halign: "center"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: pvp_bs_label
+                            text: "PVP Bs.: 0,00"
+                            font_style: "H5"
+                            theme_text_color: "Primary"
+                            bold: True
+                            halign: "center"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+        MDRaisedButton:
+            text: 'Regresar al Menú'
+            on_press: root.manager.current = 'menu'
+            pos_hint: {'center_x': 0.5}
+            size_hint_y: None
+            height: "48dp"
+
+<CalculadoraImplicitaScreen>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: "10dp"
+        ScrollView:
+            MDGridLayout:
+                cols: 1
+                spacing: "15dp"
+                adaptive_height: True
+                MDCard:
+                    orientation: 'vertical'
+                    padding: "10dp"
+                    size_hint_y: None
+                    height: "90dp"
+                    MDLabel:
+                        text: 'Tasas en Uso (Manual)'
+                        font_style: 'H6'
+                        halign: 'center'
+                    MDLabel:
+                        id: tasas_card_label
+                        text: "Modo Offline: ingrese ambas tasas"
+                        halign: 'center'
+                        theme_text_color: "Secondary"
+                MDCard:
+                    orientation: 'vertical'
+                    padding: "15dp"
+                    spacing: "10dp"
+                    adaptive_height: True
+                    MDLabel:
+                        text: 'Parámetros y Tasas'
+                        font_style: 'H6'
+                        halign: 'center'
+                    MDTextField:
+                        id: tasa_bcv_manual_input
+                        hint_text: "Tasa Oficial BCV (Bs.)"
+                        text: "0.00"
+                    MDTextField:
+                        id: tasa_implicita_input
+                        hint_text: "Tasa Implícita (Bs.)"
+                        text: "0.00"
+                    MDTextField:
+                        id: costo_fob_input
+                        hint_text: "Costo FOB ($)"
+                        text: "100.00"
+                    MDTextField:
+                        id: costo_almacen_input
+                        hint_text: "% Costo Almacén"
+                        text: "30"
+                    MDTextField:
+                        id: gastos_input
+                        hint_text: "% Gastos Totales"
+                        text: "15"
+                    MDTextField:
+                        id: utilidad_input
+                        hint_text: "% Utilidad Neta"
+                        text: "20"
+                    MDTextField:
+                        id: ventas_bs_input
+                        hint_text: "% Ventas en Bs."
+                        text: "100"
+                    MDTextField:
+                        id: solicitado_input
+                        hint_text: "Solicitado por"
+                    MDTextField:
+                        id: producto_input
+                        hint_text: "Producto"
+                MDRaisedButton:
+                    text: "Calcular Precio Final"
+                    on_press: root.realizar_calculo()
+                    pos_hint: {'center_x': 0.5}
+                    size_hint_y: None
+                    height: "48dp"
+                MDCard:
+                    id: results_card
+                    orientation: 'vertical'
+                    padding: "15dp"
+                    spacing: "10dp"
+                    adaptive_height: True
+                    MDGridLayout:
+                        cols: 1
+                        adaptive_height: True
+                        spacing: "8dp"
+                        MDLabel:
+                            text: 'Resultados del Cálculo'
+                            font_style: 'H6'
+                            halign: 'center'
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: cta_label
+                            text: "Costo Total en Almacén (CTA): $0.00"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: pvm_label
+                            text: "Precio Venta Mínimo (PVM): $0.00"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: descuento_label
+                            text: "Descuento Máx. por pago en USD: 0.00%"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: solicitado_result_label
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: producto_result_label
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: fecha_result_label
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: bcv_result_label
+                            font_style: "H6"
+                            theme_text_color: "Primary"
+                            halign: "center"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: pvp_label
+                            text: "PVP USD: $0.00"
+                            font_style: "H5"
+                            theme_text_color: "Primary"
+                            bold: True
+                            halign: "center"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+                        MDLabel:
+                            id: pvp_bs_label
+                            text: "PVP Bs.: 0,00"
+                            font_style: "H5"
+                            theme_text_color: "Primary"
+                            bold: True
+                            halign: "center"
+                            size_hint_y: None
+                            height: self.texture_size[1]
+        MDRaisedButton:
+            text: 'Regresar al Menú'
+            on_press: root.manager.current = 'menu'
+            pos_hint: {'center_x': 0.5}
+            size_hint_y: None
+            height: "48dp"
